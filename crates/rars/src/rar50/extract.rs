@@ -15,7 +15,7 @@ use std::io::{Read, Write};
 // below this boundary use the buffered path, while larger members stream once
 // and reject filtered streams through the codec's typed sentinel.
 #[cfg(not(test))]
-const BUFFERED_DECODE_LIMIT: u64 = 512 * 1024 * 1024;
+const BUFFERED_DECODE_LIMIT: u64 = 1024 * 1024 * 1024; // Increase from 512mb to 1gb
 #[cfg(test)]
 const BUFFERED_DECODE_LIMIT: u64 = 1024;
 
