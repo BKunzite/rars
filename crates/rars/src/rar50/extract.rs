@@ -716,9 +716,7 @@ impl FileHeader {
 }
 
 fn rar50_buffered_decode_limit(options: crate::ArchiveReadOptions<'_>) -> u64 {
-    options
-        .rar50_buffered_decode_limit
-        .unwrap_or(BUFFERED_DECODE_LIMIT)
+    BUFFERED_DECODE_LIMIT
 }
 
 /// Streams a RAR 5 multivolume archive set to caller-provided writers.
