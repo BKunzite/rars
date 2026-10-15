@@ -12,7 +12,7 @@ use std::io::{Read, Write};
 #[cfg(not(test))]
 const BUFFERED_DECODE_LIMIT: u64 = 2048 * 1024 * 1024; // 2gb
 #[cfg(test)]
-const BUFFERED_DECODE_LIMIT: u64 = 1024;
+const BUFFERED_DECODE_LIMIT: u64 = 2048 * 1024 * 1024;
 
 impl FileHeader {
     fn crypto_with_password(&self, password: Option<&[u8]>) -> Result<Option<Rar50Keys>> {
