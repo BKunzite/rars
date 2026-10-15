@@ -648,6 +648,7 @@ impl Archive {
     where
         F: FnMut(&ExtractedEntryMeta) -> Result<Box<dyn Write>>,
     {
+        options.with_rar50_scratch(&Rar50Scratch::new(std::env::temp_dir(), 8 * 1024 * 1024 * 1024));
         options.check_cancelled()?;
         self.extract_to_impl(options, &mut open, &mut |_, _| Ok(()), false, None, None)
             .map(|_| ())
@@ -734,7 +735,6 @@ impl Archive {
         F: FnMut(&ExtractedEntryMeta) -> Result<Box<dyn Write>>,
         R: FnMut(&ExtractedEntryMeta, &FileRedirection) -> Result<()>,
     {
-        options.with_rar50_scratch(&Rar50Scratch::new(std::env::temp_dir(), 8 * 1024 * 1024 * 1024));
         options.check_cancelled()?;
         let mut budget = crate::output_limit::OutputBudget::new(options);
         let buffered_decode_limit = rar50_buffered_decode_limit(options);
@@ -1178,6 +1178,7 @@ pub fn extract_volumes_to<F>(
 where
     F: FnMut(&ExtractedEntryMeta) -> Result<Box<dyn Write>>,
 {
+    options.with_rar50_scratch(&Rar50Scratch::new(std::env::temp_dir(), 8 * 1024 * 1024 * 1024));
     options.check_cancelled()?;
     extract_volumes_to_impl(volumes, options, &mut open, &mut |_, _| Ok(()), false)
 }
