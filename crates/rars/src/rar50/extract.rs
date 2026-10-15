@@ -16,9 +16,9 @@ use crate::Rar50Scratch;
 // below this boundary use the buffered path, while larger members stream once
 // and reject filtered streams through the codec's typed sentinel.
 #[cfg(not(test))]
-const BUFFERED_DECODE_LIMIT: u64 = 4 * 1024 * 1024 * 1024; // Increase from 512mb to 1gb
+const BUFFERED_DECODE_LIMIT: u64 = 2 * 1024 * 1024 * 1024; // Increase from 512mb to 1gb
 #[cfg(test)]
-const BUFFERED_DECODE_LIMIT: u64 = 4 * 1024 * 1024 * 1024;
+const BUFFERED_DECODE_LIMIT: u64 = 2 * 1024 * 1024 * 1024;
 
 impl FileHeader {
     fn check_output_limit(&self, budget: &crate::output_limit::OutputBudget) -> Result<()> {
@@ -734,7 +734,7 @@ impl Archive {
         F: FnMut(&ExtractedEntryMeta) -> Result<Box<dyn Write>>,
         R: FnMut(&ExtractedEntryMeta, &FileRedirection) -> Result<()>,
     {
-        options.with_rar50_scratch(Rar50Scratch::);
+        options.with_rar50_scratch(&Rar50Scratch::new(std::env::temp_dir(), 8 * 1024 * 1024 * 1024));
         options.check_cancelled()?;
         let mut budget = crate::output_limit::OutputBudget::new(options);
         let buffered_decode_limit = rar50_buffered_decode_limit(options);
