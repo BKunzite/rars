@@ -10,14 +10,15 @@ use crate::crypto::rar50::Rar50Keys;
 use crate::error::{Error, Result};
 use crate::volume_extract::{ChainedReader, SplitVolumeState, SplitVolumeStep};
 use std::io::{Read, Write};
+use crate::Rar50Scratch;
 
 // Filtered RAR5 members still need whole-member byte transforms. Members at or
 // below this boundary use the buffered path, while larger members stream once
 // and reject filtered streams through the codec's typed sentinel.
 #[cfg(not(test))]
-const BUFFERED_DECODE_LIMIT: u64 = 1024 * 1024 * 1024; // Increase from 512mb to 1gb
+const BUFFERED_DECODE_LIMIT: u64 = 4 * 1024 * 1024 * 1024; // Increase from 512mb to 1gb
 #[cfg(test)]
-const BUFFERED_DECODE_LIMIT: u64 = 1024;
+const BUFFERED_DECODE_LIMIT: u64 = 4 * 1024 * 1024 * 1024;
 
 impl FileHeader {
     fn check_output_limit(&self, budget: &crate::output_limit::OutputBudget) -> Result<()> {
@@ -733,6 +734,7 @@ impl Archive {
         F: FnMut(&ExtractedEntryMeta) -> Result<Box<dyn Write>>,
         R: FnMut(&ExtractedEntryMeta, &FileRedirection) -> Result<()>,
     {
+        options.with_rar50_scratch(Rar50Scratch::);
         options.check_cancelled()?;
         let mut budget = crate::output_limit::OutputBudget::new(options);
         let buffered_decode_limit = rar50_buffered_decode_limit(options);
@@ -1160,9 +1162,7 @@ impl FileHeader {
 }
 
 fn rar50_buffered_decode_limit(options: crate::ArchiveReadOptions<'_>) -> u64 {
-    options
-        .rar50_buffered_decode_limit
-        .unwrap_or(BUFFERED_DECODE_LIMIT)
+    BUFFERED_DECODE_LIMIT
 }
 
 /// Streams a RAR 5 multivolume archive set to caller-provided writers.
